@@ -207,7 +207,7 @@ def roll(image, delta):
     return image
 
 
-def stitch_tiles(panoid, tiles, directory, final_directory, width_num, height_num):
+def stitch_tiles(panoid, tiles, directory, final_directory, width_num, height_num, final_pano_name):
     """
     Stitches all the tiles of a panorama together. The tiles are located in
     `directory'.
@@ -230,9 +230,8 @@ def stitch_tiles(panoid, tiles, directory, final_directory, width_num, height_nu
 
     #        print fname
 
-    panorama.save(final_directory + ("/%s.jpg" % panoid))
+    panorama.save(final_pano_name)
     del panorama
-    return final_directory + ("/%s.jpg" % panoid)
 
 
 def delete_tiles(tiles, directory):
@@ -294,7 +293,7 @@ def download_flats(panoid, flat_dir, key, width=400, height=300,
         api_download(panoid, heading, flat_dir, key, width, height, fov, pitch, extension, year)
 
 
-def download_panorama(panoid, output_dir, width_num, height_num, tile_dir=None, disp=False, cb=None):
+def download_panorama(panoid, output_dir, width_num, height_num, final_pano_name, tile_dir=None, disp=False, cb=None):
     if tile_dir is None:
         tile_dir = tempfile.mkdtemp()
 
@@ -302,7 +301,7 @@ def download_panorama(panoid, output_dir, width_num, height_num, tile_dir=None, 
 
     tiles = tiles_info(panoid, width_num, height_num)
     download_tiles(tiles, tile_dir, disp=disp, cb=cb)
-    fn = stitch_tiles(panoid, tiles, tile_dir, output_dir, width_num, height_num)
+    stitch_tiles(panoid, tiles, tile_dir, output_dir, width_num, height_num, final_pano_name)
 
 
 
