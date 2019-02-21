@@ -138,7 +138,7 @@ def panoids(lat, lon, closest=False, disp=False, proxies=None):
         return pans
 
 
-def tiles_info(panoid):
+def tiles_info(panoid, width_num, height_num):
     """
     Generate a list of a panorama's tiles and their position.
 
@@ -148,7 +148,9 @@ def tiles_info(panoid):
     image_url = "http://cbk0.google.com/cbk?output=tile&panoid={0:}&zoom=5&x={1:}&y={2:}"
 
     # The tiles positions
-    coord = list(itertools.product(range(26), range(13)))
+    coord = list(itertools.product(range(width_num), range(height_num)))
+    #coord = list(itertools.product(range(32), range(16)))
+    #coord = list(itertools.product(range(26), range(13)))
 
     tiles = [(x, y, "%s_%dx%d.jpg" % (panoid, x, y), image_url.format(panoid, x, y)) for x, y in coord]
 
@@ -205,7 +207,7 @@ def roll(image, delta):
     return image
 
 
-def stitch_tiles(panoid, tiles, directory, final_directory):
+def stitch_tiles(panoid, tiles, directory, final_directory, width_num, height_num):
     """
     Stitches all the tiles of a panorama together. The tiles are located in
     `directory'.
@@ -214,7 +216,9 @@ def stitch_tiles(panoid, tiles, directory, final_directory):
     tile_width = 512
     tile_height = 512
 
-    panorama = Image.new('RGB', (26 * tile_width, 13 * tile_height))
+    panorama = Image.new('RGB', (width_num * tile_width, height_num * tile_height))
+    #panorama = Image.new('RGB', (32 * tile_width, 16 * tile_height))
+    #panorama = Image.new('RGB', (26 * tile_width, 13 * tile_height))
 
     for x, y, fname, url in tiles:
         fname = directory + "/" + fname
@@ -290,15 +294,15 @@ def download_flats(panoid, flat_dir, key, width=400, height=300,
         api_download(panoid, heading, flat_dir, key, width, height, fov, pitch, extension, year)
 
 
-def download_panorama(panoid, output_dir, tile_dir=None, disp=False, cb=None):
+def download_panorama(panoid, output_dir, width_num, height_num, tile_dir=None, disp=False, cb=None):
     if tile_dir is None:
         tile_dir = tempfile.mkdtemp()
 
     assert os.path.isdir(os.path.expanduser(output_dir))
 
-    tiles = tiles_info(panoid)
+    tiles = tiles_info(panoid, width_num, height_num)
     download_tiles(tiles, tile_dir, disp=disp, cb=cb)
-    fn = stitch_tiles(panoid, tiles, tile_dir, output_dir)
+    fn = stitch_tiles(panoid, tiles, tile_dir, output_dir, width_num, height_num)
 
 
 
